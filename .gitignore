@@ -77,3 +77,18 @@ firebase.json
 android/key.properties
 **/*.jks
 **/*.keystore
+
+# ---------------------------------------------------------------------------
+# Catch-all for credentials added later. Cheaper than remembering.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+*.pem
+*.p8
+*.p12
+*secrets.dart
+*_secret.dart
+*_secrets.dart
+api_keys.dart
+**/service-account*.json
+**/serviceAccountKey*.json

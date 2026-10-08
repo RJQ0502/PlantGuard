@@ -1,0 +1,90 @@
+rules_version = '2';
+
+// ===========================================================================
+//  PlantGuard Firestore security rules
+//
+//  These are the ONLY thing standing between your database and the internet.
+//  Your Firebase config files are not in the repo, but they ship inside every
+//  APK you build, so anyone with the app can extract them. Obscurity is not a
+//  protection; these rules are.
+//
+//  Paste into: Firebase Console -> Firestore Database -> Rules -> Publish
+//  (or `firebase deploy --only firestore:rules` if you set up the CLI)
+// ===========================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------
+    // User profiles
+    // -------------------------------------------------------------------
+    match /users/{uid} {
+
+      // The owner, and only the owner, reads and writes their own profile.
+      allow get, write: if request.auth != null && request.auth.uid == uid;
+
+      // INTERIM RULE - see the note below, this one is a compromise.
+      //
+      // Sign-in has to turn a typed username into an email BEFORE the user is
+      // authenticated, so auth_service.signIn() runs this query unauthenticated:
+      //     users.where('username', '==', x).limit(1)
+      //
+      // limit <= 1 stops anyone dumping the whole collection in one request.
+      // Be clear-eyed about what it does NOT stop: a caller can still page
+      // through one document at a time with a cursor, so this slows down
+      // enumeration rather than preventing it, and a matched document still
+      // carries that user's email address.
+      //
+      // THE REAL FIX is a separate `usernames/{username}` collection holding
+      // just the email, read by exact document ID with `get` and with `list`
+      // denied outright. Then no query against `users` is needed at all and
+      // this rule becomes `allow get, write: owner only`. It needs a small
+      // change to checkAvailability() and signIn() in auth_service.dart.
+      allow list: if request.query.limit <= 1;
+    }
+
+    // -------------------------------------------------------------------
+    // The target design, ready for when auth_service.dart switches to it.
+    // Harmless to publish now - nothing writes here yet.
+    // -------------------------------------------------------------------
+    match /usernames/{username} {
+
+      // Readable by exact ID only. A caller must already know the username;
+      // `list` is denied, so the collection cannot be enumerated at all.
+      allow get: if true;
+      allow list: if false;
+
+      // `create` only ever fires when the document does not exist, so this
+      // doubles as the race-free way to claim a username.
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid;
+
+      allow update, delete: if request.auth != null
+                    && resource.data.uid == request.auth.uid;
+    }
+
+    // -------------------------------------------------------------------
+    // IoT devices and their readings - for the dashboard
+    // -------------------------------------------------------------------
+    match /devices/{deviceId} {
+      allow read, update, delete: if request.auth != null
+                    && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    match /readings/{readingId} {
+      allow read: if request.auth != null
+                    && resource.data.ownerUid == request.auth.uid;
+      allow create: if request.auth != null
+                    && request.resource.data.ownerUid == request.auth.uid;
+
+      // Append-only. A sensor reading is a historical fact; nothing should be
+      // able to rewrite last week's moisture level.
+      allow update, delete: if false;
+    }
+
+    // Anything not matched above is denied. Firestore defaults to deny, and
+    // that default is deliberately left in place - no catch-all rule here.
+  }
+}
