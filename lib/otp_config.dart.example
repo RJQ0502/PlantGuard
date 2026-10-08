@@ -1,0 +1,34 @@
+// ===========================================================================
+//  TEMPLATE - copy this file to lib/otp_config.dart and fill in the values.
+//
+//      Windows:  copy lib\otp_config.dart.example lib\otp_config.dart
+//
+//  The real otp_config.dart is in .gitignore and is never committed, because
+//  privateKey below is a working credential.
+//
+//  This file keeps the .example extension on purpose so the Dart analyzer
+//  ignores it - otherwise you would have two OtpConfig classes in the project.
+// ===========================================================================
+
+/// EmailJS credentials, used by OtpService to email the 6-digit signup code.
+///
+/// Where each value lives in the EmailJS dashboard (emailjs.com):
+///   serviceId   Email Services  -> your Gmail service      (service_xxxxxxx)
+///   templateId  Email Templates -> your OTP template       (template_xxxxxx)
+///   publicKey   Account -> General -> Public Key
+///   privateKey  Account -> General -> Private Key
+///
+/// The private key is required because EmailJS treats Flutter as a
+/// non-browser caller, and strict API mode rejects those without it.
+///
+/// These are compile-time constants: after editing, do a FULL restart.
+/// Hot reload will not pick them up, and the app will keep insisting the
+/// email service is not set up.
+class OtpConfig {
+  const OtpConfig._();
+
+  static const String serviceId = '';
+  static const String templateId = '';
+  static const String publicKey = '';
+  static const String privateKey = '';
+}

@@ -1,0 +1,79 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# ===========================================================================
+# PlantGuard - credentials and generated config
+# ===========================================================================
+
+# A REAL SECRET. This holds the EmailJS access token; anyone who has it can
+# send mail through the account up to its quota. Copy
+# lib/otp_config.dart.example to lib/otp_config.dart and fill it in locally.
+lib/otp_config.dart
+
+# Firebase client config.
+#
+# To be accurate: these are not secrets in the classic sense. Google designs
+# them to ship inside the app binary, and your real protection is Firestore
+# security rules plus App Check - not the obscurity of these files.
+#
+# They are excluded anyway for one practical reason: this repo is private now
+# but may go public later, and anything committed stays in git history
+# permanently. Keeping them out now means that switch costs nothing.
+#
+# On a fresh clone, regenerate them with:  flutterfire configure
+lib/firebase_options.dart
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+firebase.json
+.firebaserc
+
+# Android signing material. A leaked keystore lets someone else publish an
+# update that your users' phones accept as genuine. There is no recovery from
+# this other than a new app listing.
+android/key.properties
+**/*.jks
+**/*.keystore
